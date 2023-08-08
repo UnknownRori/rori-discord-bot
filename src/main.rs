@@ -1,5 +1,8 @@
 use anyhow::Context as _;
-use poise::serenity_prelude as serenity;
+use poise::{
+    serenity_prelude::{self as serenity, Activity},
+    PrefixFrameworkOptions,
+};
 use shuttle_poise::ShuttlePoise;
 use shuttle_secrets::SecretStore;
 
@@ -30,6 +33,9 @@ async fn poise(#[shuttle_secrets::Secrets] secret_store: SecretStore) -> Shuttle
         .intents(serenity::GatewayIntents::non_privileged())
         .setup(|ctx, _ready, framework| {
             Box::pin(async move {
+                ctx.set_activity(Activity::playing("Improving my self"))
+                    .await;
+
                 poise::builtins::register_globally(ctx, &framework.options().commands).await?;
                 Ok(Data {})
             })
