@@ -11,9 +11,15 @@ type Error = Box<dyn std::error::Error + Send + Sync>;
 type Context<'a> = poise::Context<'a, Data, Error>;
 
 /// Responds with "pong!"
-#[poise::command(slash_command)]
+#[poise::command(slash_command, prefix_command)]
 async fn ping(ctx: Context<'_>) -> Result<(), Error> {
     ctx.say("pong!").await?;
+    Ok(())
+}
+
+#[poise::command(slash_command, prefix_command)]
+async fn say(ctx: Context<'_>) -> Result<(), Error> {
+    ctx.say(ctx.invocation_string()).await?;
     Ok(())
 }
 
@@ -26,7 +32,11 @@ async fn poise(#[shuttle_secrets::Secrets] secret_store: SecretStore) -> Shuttle
 
     let framework = poise::Framework::builder()
         .options(poise::FrameworkOptions {
-            commands: vec![ping()],
+            commands: vec![ping(), say()],
+            prefix_options: PrefixFrameworkOptions {
+                prefix: Some("$".to_owned()),
+                ..Default::default()
+            },
             ..Default::default()
         })
         .token(discord_token)
