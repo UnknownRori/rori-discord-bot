@@ -40,6 +40,7 @@ async fn say(
 }
 
 /// To inspire someone using real or historic person's quote
+#[poise::command(slash_command)]
 async fn inspire(ctx: Context<'_>) -> Result<(), Error> {
     match QuoteAPI::fetch().await {
         Ok(quote) => {
@@ -72,7 +73,7 @@ async fn poise(
 
     let framework = poise::Framework::builder()
         .options(poise::FrameworkOptions {
-            commands: vec![ping(), say()],
+            commands: vec![ping(), say(), inspire()],
             prefix_options: PrefixFrameworkOptions {
                 prefix: Some("$".to_owned()),
                 ..Default::default()
