@@ -1,23 +1,17 @@
-// mod quotes;
+mod quotes;
 
+use ::serenity::utils::MessageBuilder;
 use anyhow::Context as _;
 use poise::{
     serenity_prelude::{self as serenity, Activity},
     PrefixFrameworkOptions,
 };
+use quotes::QuoteAPI;
 use shuttle_poise::ShuttlePoise;
 use shuttle_secrets::SecretStore;
 
 // TODO : Extract this into different file
-struct AppState {
-    // pub quotes: Vec<crate::quotes::Quote>,
-}
-
-impl Default for AppState {
-    fn default() -> Self {
-        AppState { /*quotes: vec![]*/ }
-    }
-}
+struct AppState {}
 
 type Error = Box<dyn std::error::Error + Send + Sync>;
 type Context<'a> = poise::Context<'a, AppState, Error>;
@@ -39,17 +33,44 @@ async fn say(
     Ok(())
 }
 
+/// To inspire someone using real or historic person's quote
 async fn inspire(ctx: Context<'_>) -> Result<(), Error> {
-    // TODO : Implement this
+    match QuoteAPI::fetch().await {
+        Ok(quote) => {
+            let message = MessageBuilder::new()
+                .push_quote_line(quote.content)
+                .push(format!(" - {}", quote.author))
+                .build();
+
+            ctx.say(message);
+        }
+        Err(err) => {
+            tracing::error!("{:#?}", err);
+            ctx.say("Failed to fetch quote");
+        }
+    }
+
     Ok(())
 }
 
 #[shuttle_runtime::main]
-async fn poise(#[shuttle_secrets::Secrets] secret_store: SecretStore) -> ShuttlePoise<AppState, Error> {
+async fn poise(
+    #[shuttle_secrets::Secrets] secret_store: SecretStore,
+) -> ShuttlePoise<AppState, Error> {
     // Get the discord token set in `Secrets.toml`
     let discord_token = secret_store
         .get("DISCORD_TOKEN")
         .context("'DISCORD_TOKEN' was not found")?;
+
+    let mut app_state = AppState::default();
+
+    let quotes = QuoteAPI::fetch().await;
+    if let Ok(quotes) = quotes {
+        tracing::info!("Successfully fetch quotes");
+        app_state.quotes = quotes;
+    } else {
+        tracing::warn!("Failed to fetch quotes");
+    }
 
     let framework = poise::Framework::builder()
         .options(poise::FrameworkOptions {
@@ -68,7 +89,7 @@ async fn poise(#[shuttle_secrets::Secrets] secret_store: SecretStore) -> Shuttle
                     .await;
 
                 poise::builtins::register_globally(ctx, &framework.options().commands).await?;
-                Ok(AppState {})
+                Ok(app_state)
             })
         })
         .build()
