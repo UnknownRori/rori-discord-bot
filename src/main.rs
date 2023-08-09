@@ -13,6 +13,12 @@ use shuttle_secrets::SecretStore;
 // TODO : Extract this into different file
 struct AppState {}
 
+impl Default for AppState {
+    fn default() -> Self {
+        Self {}
+    }
+}
+
 type Error = Box<dyn std::error::Error + Send + Sync>;
 type Context<'a> = poise::Context<'a, AppState, Error>;
 
@@ -42,11 +48,11 @@ async fn inspire(ctx: Context<'_>) -> Result<(), Error> {
                 .push(format!(" - {}", quote.author))
                 .build();
 
-            ctx.say(message);
+            ctx.say(message).await?;
         }
         Err(err) => {
             tracing::error!("{:#?}", err);
-            ctx.say("Failed to fetch quote");
+            ctx.say("Failed to fetch quote").await?;
         }
     }
 
@@ -63,14 +69,6 @@ async fn poise(
         .context("'DISCORD_TOKEN' was not found")?;
 
     let mut app_state = AppState::default();
-
-    let quotes = QuoteAPI::fetch().await;
-    if let Ok(quotes) = quotes {
-        tracing::info!("Successfully fetch quotes");
-        app_state.quotes = quotes;
-    } else {
-        tracing::warn!("Failed to fetch quotes");
-    }
 
     let framework = poise::Framework::builder()
         .options(poise::FrameworkOptions {
