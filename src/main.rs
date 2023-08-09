@@ -17,9 +17,13 @@ async fn ping(ctx: Context<'_>) -> Result<(), Error> {
     Ok(())
 }
 
+/// Say something
 #[poise::command(slash_command, prefix_command)]
-async fn say(ctx: Context<'_>) -> Result<(), Error> {
-    ctx.say(ctx.invocation_string()).await?;
+async fn say(
+    ctx: Context<'_>,
+    #[description = "What kind of thing should i say?"] text: String,
+) -> Result<(), Error> {
+    ctx.say(text).await?;
     Ok(())
 }
 
