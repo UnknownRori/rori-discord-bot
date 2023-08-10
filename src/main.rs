@@ -45,8 +45,8 @@ async fn inspire(ctx: Context<'_>) -> Result<(), Error> {
     match QuoteAPI::fetch().await {
         Ok(quote) => {
             let message = MessageBuilder::new()
-                .push_quote_line(quote.content)
-                .push(format!(" - {}", quote.author))
+                .push_quote_line(format!("\"{}\"", quote.content))
+                .push_quote_line_safe(format!(" - {}", quote.author))
                 .build();
 
             ctx.say(message).await?;
