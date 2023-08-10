@@ -1,65 +1,19 @@
+mod app;
+mod commands;
 mod quotes;
 
-use ::serenity::utils::MessageBuilder;
+use ::serenity::prelude::GatewayIntents;
 use anyhow::Context as _;
+use app::{AppState, Error};
+use commands::{help, inspire, ping, say};
 use poise::{
     serenity_prelude::{self as serenity, Activity},
     PrefixFrameworkOptions,
 };
-use quotes::QuoteAPI;
 use shuttle_poise::ShuttlePoise;
 use shuttle_secrets::SecretStore;
 
-// TODO : Extract this into different file
-struct AppState {}
-
-impl Default for AppState {
-    fn default() -> Self {
-        Self {}
-    }
-}
-
-type Error = Box<dyn std::error::Error + Send + Sync>;
-type Context<'a> = poise::Context<'a, AppState, Error>;
-
-/// Responds with "pong!"
-#[poise::command(slash_command, prefix_command)]
-async fn ping(ctx: Context<'_>) -> Result<(), Error> {
-    ctx.say("pong!").await?;
-    Ok(())
-}
-
-/// Say something
-#[poise::command(slash_command, prefix_command)]
-async fn say(
-    ctx: Context<'_>,
-    #[description = "What kind of thing should i say?"] text: String,
-) -> Result<(), Error> {
-    ctx.say(text).await?;
-    Ok(())
-}
-
-/// To inspire someone using real or historic person's quote
-#[poise::command(slash_command)]
-async fn inspire(ctx: Context<'_>) -> Result<(), Error> {
-    match QuoteAPI::fetch().await {
-        Ok(quote) => {
-            let message = MessageBuilder::new()
-                .push_quote_line(format!("\"{}\"", quote.content))
-                .push_quote_line_safe(format!(" - {}", quote.author))
-                .build();
-
-            ctx.say(message).await?;
-        }
-        Err(err) => {
-            tracing::error!("{:#?}", err);
-            ctx.say("Failed to fetch quote").await?;
-        }
-    }
-
-    Ok(())
-}
-
+// TODO : Maybe refactor this
 #[shuttle_runtime::main]
 async fn poise(
     #[shuttle_secrets::Secrets] secret_store: SecretStore,
@@ -73,15 +27,23 @@ async fn poise(
 
     let framework = poise::Framework::builder()
         .options(poise::FrameworkOptions {
-            commands: vec![ping(), say(), inspire()],
+            commands: vec![ping(), say(), inspire(), help()],
             prefix_options: PrefixFrameworkOptions {
-                prefix: Some("$".to_owned()),
+                prefix: Some("~".into()),
+                edit_tracker: Some(poise::EditTracker::for_timespan(
+                    std::time::Duration::from_secs(3600),
+                )),
+                case_insensitive_commands: true,
                 ..Default::default()
             },
             ..Default::default()
         })
         .token(discord_token)
-        .intents(serenity::GatewayIntents::non_privileged())
+        .intents(
+            GatewayIntents::MESSAGE_CONTENT
+                | GatewayIntents::GUILD_MESSAGES
+                | GatewayIntents::non_privileged(),
+        )
         .setup(move |ctx, _ready, framework| {
             Box::pin(async move {
                 ctx.set_activity(Activity::playing("Improving my self"))
