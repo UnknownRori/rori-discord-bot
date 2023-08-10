@@ -43,8 +43,7 @@ async fn poise(
         )
         .setup(move |ctx, _ready, framework| {
             Box::pin(async move {
-                ctx.set_activity(Activity::playing("Playing with Remi"))
-                    .await;
+                ctx.set_activity(Activity::playing("with Remi")).await;
 
                 poise::builtins::register_globally(ctx, &framework.options().commands).await?;
                 Ok(app_state)
