@@ -25,8 +25,8 @@ pub async fn inspire(ctx: Context<'_>) -> Result<(), Error> {
     match QuoteAPI::fetch().await {
         Ok(quote) => {
             let message = MessageBuilder::new()
-                .push_quote_line(format!("\"{}\"", quote.content))
-                .push_quote_line_safe(format!(" - {}", quote.author))
+                .push_quote_line(format!("_\"{}\"_", quote.content))
+                .push_quote_line(format!(" \\- *{}*", quote.author))
                 .build();
 
             ctx.say(message).await?;
@@ -40,7 +40,7 @@ pub async fn inspire(ctx: Context<'_>) -> Result<(), Error> {
     Ok(())
 }
 
-/// Show this menu
+/// Show what you can do with Rori Bot
 #[poise::command(prefix_command, track_edits, slash_command)]
 pub async fn help(
     ctx: Context<'_>,
