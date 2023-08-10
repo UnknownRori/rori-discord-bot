@@ -1,16 +1,49 @@
-# Serenity Hello World Bot with Shuttle
+# Rori Discord Bot
 
-In this example we will deploy a Serenity bot with Shuttle that responds to the `!hello` command with `world!`. To run this bot we need a valid Discord Token. To get started log in to the [Discord developer portal](https://discord.com/developers/applications).
+This is a Discord bot written in Rust that demonstrates basic command handling using both prefix and slash commands. The bot in future will also integrates with GPT-2 for generating text responses.
 
-1. Click the New Application button, name your application and click Create.
-2. Navigate to the Bot tab in the lefthand menu, and add a new bot.
-3. On the bot page click the Reset Token button to reveal your token. Put this token in your `Secrets.toml`. It's very important that you don't reveal your token to anyone, as it can be abused. Create a `.gitignore` file to omit your `Secrets.toml` from version control.
-4. For the sake of this example, you also need to scroll down on the bot page to the Message Content Intent section and enable that option.
+## 🛠️ Development
 
-To add the bot to a server we need to create an invite link.
+Make sure you have cargo installed
 
-1. On your bot's application page, open the OAuth2 page via the lefthand panel.
-2. Go to the URL Generator via the lefthand panel, and select the `bot` scope as well as the `Send Messages` permission in the Bot Permissions section.
-3. Copy the URL, open it in your browser and select a Discord server you wish to invite the bot to.
+```sh
+# Clone the repository and enter the directory
+git clone https://github.com/UnknownRori/rori-discord-bot
+cd rori-discord-bot
 
-For more information please refer to the [Discord docs](https://discord.com/developers/docs/getting-started) as well as the [Serenity repo](https://github.com/serenity-rs/serenity) for more examples.
+# Build the project
+cargo build
+
+# Test the project
+cargo test
+```
+
+## 🚀 Deployment for Shuttle
+
+Make sure you installed shuttle
+
+```sh
+cargo install cargo-shuttle
+```
+
+```sh
+# Enter directory of the cloned repository
+cd rori-discord-bot
+
+# Copy the example secret file
+cp ./Secrets.toml.example ./Secrets.toml
+
+# Enter credentials and other stuff
+vim ./Secrets.toml
+
+# Deploy the app
+cargo shuttle deploy
+```
+
+## 🌟 Contribution
+
+Feel free to contribute, send pull request or issue and i will take a look
+
+## 📑 License
+
+[BSD-3 Clause License](./LICENSE)
