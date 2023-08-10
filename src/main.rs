@@ -6,10 +6,7 @@ use ::serenity::prelude::GatewayIntents;
 use anyhow::Context as _;
 use app::{AppState, Error};
 use commands::{help, inspire, ping, say};
-use poise::{
-    serenity_prelude::{self as serenity, Activity},
-    PrefixFrameworkOptions,
-};
+use poise::{serenity_prelude::Activity, PrefixFrameworkOptions};
 use shuttle_poise::ShuttlePoise;
 use shuttle_secrets::SecretStore;
 
@@ -23,7 +20,7 @@ async fn poise(
         .get("DISCORD_TOKEN")
         .context("'DISCORD_TOKEN' was not found")?;
 
-    let mut app_state = AppState::default();
+    let app_state = AppState::default();
 
     let framework = poise::Framework::builder()
         .options(poise::FrameworkOptions {
@@ -46,7 +43,7 @@ async fn poise(
         )
         .setup(move |ctx, _ready, framework| {
             Box::pin(async move {
-                ctx.set_activity(Activity::playing("Improving my self"))
+                ctx.set_activity(Activity::playing("Playing with Remi"))
                     .await;
 
                 poise::builtins::register_globally(ctx, &framework.options().commands).await?;
