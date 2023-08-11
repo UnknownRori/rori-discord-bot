@@ -4,11 +4,12 @@ mod quotes;
 
 use ::serenity::prelude::GatewayIntents;
 use anyhow::Context as _;
-use app::{AppState, Error};
-use commands::{help, inspire, ping, say};
 use poise::{serenity_prelude::Activity, PrefixFrameworkOptions};
 use shuttle_poise::ShuttlePoise;
 use shuttle_secrets::SecretStore;
+
+use app::{AppState, Error};
+use commands::{help, inspire, ping, say};
 
 // TODO : Maybe refactor this
 #[shuttle_runtime::main]

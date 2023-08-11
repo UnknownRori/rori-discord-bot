@@ -1,6 +1,7 @@
+use serenity::utils::MessageBuilder;
+
 use crate::app::{Context, Error};
 use crate::quotes::QuoteAPI;
-use serenity::utils::MessageBuilder;
 
 /// Responds with "pong!"
 #[poise::command(slash_command, prefix_command)]
@@ -26,6 +27,7 @@ pub async fn inspire(ctx: Context<'_>) -> Result<(), Error> {
         Ok(quote) => {
             let message = MessageBuilder::new()
                 .push_quote_line(format!("_\"{}\"_", quote.content))
+                .push_quote_line("")
                 .push_quote_line(format!(" \\- *{}*", quote.author))
                 .build();
 

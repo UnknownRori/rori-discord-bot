@@ -1,10 +1,7 @@
-pub struct AppState {}
+use serde::{Deserialize, Serialize};
 
-impl Default for AppState {
-    fn default() -> Self {
-        Self {}
-    }
-}
+#[derive(Default, Debug, Serialize, Deserialize)]
+pub struct AppState {}
 
 pub type Error = Box<dyn std::error::Error + Send + Sync>;
 pub type Context<'a> = poise::Context<'a, AppState, Error>;

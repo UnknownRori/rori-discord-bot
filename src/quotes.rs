@@ -1,6 +1,15 @@
+/// This file handle Quotes API from https://api.quotable.io/
+///
+/// Example Code
+/// ```rust
+/// fn fetch_quote() -> Result<(), reqwest::Error> {
+///    let quote = QuoteAPI::fetch().await?;
+///    dbg!(quote);
+/// }
+/// ```
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Quote {
     #[serde(rename = "_id")]
     pub id: String,
@@ -27,11 +36,15 @@ pub struct Quote {
     pub date_modified: String,
 }
 
+/// This struct is just way to abstract away the Quote API
 pub struct QuoteAPI;
 
 impl QuoteAPI {
+    /// Quote API Endpoint
+    const BASE_URL: &str = "https://api.quotable.io/";
+
     pub async fn fetch() -> Result<Quote, reqwest::Error> {
-        Ok(reqwest::get("https://api.quotable.io/random")
+        Ok(reqwest::get(format!("{}/random", Self::BASE_URL))
             .await?
             .json::<Quote>()
             .await?)
