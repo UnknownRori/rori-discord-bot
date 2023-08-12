@@ -5,6 +5,7 @@ mod quotes;
 use ::serenity::prelude::GatewayIntents;
 use anyhow::Context as _;
 use poise::{serenity_prelude::Activity, PrefixFrameworkOptions};
+use shuttle_persist::PersistInstance;
 use shuttle_poise::ShuttlePoise;
 use shuttle_secrets::SecretStore;
 
@@ -15,6 +16,7 @@ use commands::{help, inspire, ping, say};
 #[shuttle_runtime::main]
 async fn poise(
     #[shuttle_secrets::Secrets] secret_store: SecretStore,
+    #[shuttle_persist::Persist] persist: PersistInstance,
 ) -> ShuttlePoise<AppState, Error> {
     // Get the discord token set in `Secrets.toml`
     let discord_token = secret_store
