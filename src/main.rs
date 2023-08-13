@@ -23,7 +23,7 @@ async fn poise(
         .get("DISCORD_TOKEN")
         .context("'DISCORD_TOKEN' was not found")?;
 
-    let app_state = AppState::default();
+    let app_state = AppState::new(persist);
 
     let framework = poise::Framework::builder()
         .options(poise::FrameworkOptions {
