@@ -9,7 +9,8 @@ poise = "0.5.5"
 shuttle-poise = "0.23.0"
 shuttle-serenity = "0.23.0"
 shuttle-runtime = "0.23.0"
-serenity = { version = "0.11.5", default-features = false, features = ["client", "gateway", "rustls_backend", "model"] }
+serenity = { version = "0.11.5", default-features = false, features = ["client", "gateway", "rustls_backend", "model", "voice"] }
+songbird = "0.3.2"
 shuttle-secrets = "0.23.0"
 tokio = "1.26.0"
 tracing = "0.1.37"

@@ -8,6 +8,7 @@ use poise::{serenity_prelude::Activity, PrefixFrameworkOptions};
 use shuttle_persist::PersistInstance;
 use shuttle_poise::ShuttlePoise;
 use shuttle_secrets::SecretStore;
+use songbird::SerenityInit;
 
 use app::{AppState, Error};
 use commands::{help, inspire, ping, say};
@@ -44,6 +45,7 @@ async fn poise(
                 | GatewayIntents::GUILD_MESSAGES
                 | GatewayIntents::non_privileged(),
         )
+        .client_settings(|client| client.register_songbird())
         .setup(move |ctx, _ready, framework| {
             Box::pin(async move {
                 ctx.set_activity(Activity::playing("with Remi")).await;
