@@ -1,5 +1,6 @@
 mod app;
 mod commands;
+mod llm;
 mod quotes;
 
 use app::{app_state::AppState, bot::DiscordBot, Error};
