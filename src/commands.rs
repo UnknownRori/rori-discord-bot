@@ -1,6 +1,9 @@
+use std::sync::Arc;
+
 use serenity::utils::MessageBuilder;
 
 use crate::app::{Context, Error};
+use crate::llm::infer_text;
 use crate::quotes::QuoteAPI;
 
 /// Responds with "pong!"
@@ -37,6 +40,24 @@ pub async fn inspire(ctx: Context<'_>) -> Result<(), Error> {
             tracing::error!("{:#?}", err);
             ctx.say("Failed to fetch quote").await?;
         }
+    }
+
+    Ok(())
+}
+
+#[poise::command(slash_command, owners_only)]
+pub async fn infer(
+    ctx: Context<'_>,
+    #[description = "Prompt a text that should be infered"] prompt: String,
+) -> Result<(), Error> {
+    // ? INFO : May god have mercy on me
+    ctx.defer().await?;
+
+    let model = Arc::clone(&ctx.data().model);
+    if let Ok(model) = model.try_lock() {
+        ctx.say(infer_text(model.as_ref(), prompt).await).await?;
+    } else {
+        ctx.say("Model in use...").await?;
     }
 
     Ok(())

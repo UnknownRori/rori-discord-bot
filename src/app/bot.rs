@@ -2,14 +2,16 @@ use std::sync::Arc;
 
 use ::serenity::prelude::GatewayIntents;
 use anyhow::Context as _;
+use llm_wrapper::llm::ModelParameters;
 use poise::{serenity_prelude::Activity, Framework, PrefixFrameworkOptions};
 use shuttle_persist::PersistInstance;
 use shuttle_secrets::SecretStore;
 use songbird::SerenityInit;
+use tokio::sync::Mutex;
 
 use crate::app::app_state::AppState;
 use crate::app::Error;
-use crate::commands::{help, inspire, ping, say};
+use crate::commands::{help, infer, inspire, ping, say};
 
 pub struct DiscordBot;
 
@@ -23,11 +25,23 @@ impl DiscordBot {
             .get("DISCORD_TOKEN")
             .context("'DISCORD_TOKEN' was not found")?;
 
-        let app_state = AppState::new(persist);
+        let model = llm_wrapper::llm::load_dynamic(
+            Some(llm_wrapper::llm::ModelArchitecture::Gpt2),
+            std::path::Path::new("models/gpt-2-345M/ggml-model-f16.bin"),
+            llm_wrapper::llm::TokenizerSource::HuggingFaceTokenizerFile(
+                std::path::Path::new("models/gpt-2-345M/tokenizer.json").to_path_buf(),
+            ),
+            ModelParameters::default(),
+            llm_wrapper::llm::load_progress_callback_stdout,
+        )
+        .expect("Failed to load model...");
+        let model = Arc::new(Mutex::new(model));
+
+        let app_state = AppState::new(model, persist);
 
         let framework = poise::Framework::builder()
             .options(poise::FrameworkOptions {
-                commands: vec![ping(), say(), inspire(), help()],
+                commands: vec![ping(), say(), inspire(), infer(), help()],
                 prefix_options: PrefixFrameworkOptions {
                     prefix: Some("~".into()),
                     edit_tracker: Some(poise::EditTracker::for_timespan(
