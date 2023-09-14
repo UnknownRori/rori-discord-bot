@@ -41,7 +41,7 @@ pub struct QuoteAPI;
 
 impl QuoteAPI {
     /// Quote API Endpoint
-    const BASE_URL: &str = "https://api.quotable.io/";
+    const BASE_URL: &str = "https://api.quotable.io";
 
     pub async fn fetch() -> Result<Quote, reqwest::Error> {
         Ok(reqwest::get(format!("{}/random", Self::BASE_URL))
