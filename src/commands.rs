@@ -24,7 +24,7 @@ pub async fn say(
 }
 
 /// To inspire someone using real or historic person's quote
-#[poise::command(slash_command)]
+#[poise::command(slash_command, prefix_command)]
 pub async fn inspire(ctx: Context<'_>) -> Result<(), Error> {
     match QuoteAPI::fetch().await {
         Ok(quote) => {
@@ -45,7 +45,7 @@ pub async fn inspire(ctx: Context<'_>) -> Result<(), Error> {
     Ok(())
 }
 
-#[poise::command(slash_command, owners_only)]
+#[poise::command(slash_command, prefix_command, owners_only)]
 pub async fn infer(
     ctx: Context<'_>,
     #[description = "Prompt a text that should be infered"] prompt: String,
