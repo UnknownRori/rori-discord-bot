@@ -53,12 +53,21 @@ pub async fn infer(
     // ? INFO : May god have mercy on me
     ctx.defer().await?;
 
-    let model = Arc::clone(&ctx.data().model);
-    if let Ok(model) = model.try_lock() {
-        ctx.say(infer_text(model.as_ref(), prompt).await).await?;
-    } else {
-        ctx.say("Model in use...").await?;
-    }
+    match &ctx.data().model {
+        Some(model) => {
+            let model = Arc::clone(model);
+            if let Ok(model) = model.try_lock() {
+                ctx.say(infer_text(model.as_ref(), prompt).await).await?;
+            } else {
+                ctx.say("Model in use...").await?;
+            }
+            Ok::<(), Error>(())
+        }
+        None => {
+            ctx.say("Model is not available on the server...").await?;
+            Ok(())
+        }
+    }?;
 
     Ok(())
 }

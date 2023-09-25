@@ -33,9 +33,18 @@ impl DiscordBot {
             ),
             ModelParameters::default(),
             llm_wrapper::llm::load_progress_callback_stdout,
-        )
-        .expect("Failed to load model...");
-        let model = Arc::new(Mutex::new(model));
+        );
+
+        let model = match model {
+            Ok(model) => {
+                tracing::info!("GPT-2 Model is loaded!");
+                Some(Arc::new(Mutex::new(model)))
+            }
+            Err(_) => {
+                tracing::warn!("GPT-2 Model is not loaded : probable cause is file not found");
+                None
+            }
+        };
 
         let app_state = AppState::new(model, persist);
 
