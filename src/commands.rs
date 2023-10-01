@@ -45,7 +45,7 @@ pub async fn inspire(ctx: Context<'_>) -> Result<(), Error> {
     Ok(())
 }
 
-#[poise::command(slash_command, prefix_command, owners_only)]
+#[poise::command(slash_command, prefix_command)]
 pub async fn infer(
     ctx: Context<'_>,
     #[description = "Prompt a text that should be infered"] prompt: String,
@@ -64,7 +64,8 @@ pub async fn infer(
             Ok::<(), Error>(())
         }
         None => {
-            ctx.say("Model is not available on the server...").await?;
+            ctx.say("Model is currently not included in Prouduction Server")
+                .await?;
             Ok(())
         }
     }?;
